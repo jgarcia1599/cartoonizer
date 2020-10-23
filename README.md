@@ -1,5 +1,10 @@
 # Realtime fast style transfer
 
+## To run locally
+```
+bash run-server.sh
+```
+
 ![alt tag](https://raw.githubusercontent.com/garynewby/Realtime-Neural-Style-Transfer/master/screen.png)
 
 Exploring realtime neural networks and fast style transfer using webGL in the web browser (Chrome only).
