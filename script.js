@@ -1,93 +1,119 @@
-/* If you're feeling fancy you can add interactivity 
-    to your site with Javascript */
+const model = new mi.ArbitraryStyleTransferNetwork();
+const canvas = document.getElementById('stylized');
+const ctx = canvas.getContext('2d');
+const contentImg = document.getElementById('content');
+const styleImg = document.getElementById('style');
+const loading = document.getElementById('loading');
+const notLoading = document.getElementById('ready');
 
+setupDemo();
 
-console.log("hi");
-
-
-
-
-
-
-var  myColor, mySize,canvas;
-
-
-let pg;
-
-let input,img;
-
-function setup(){
-	//Create canvas
-	canvas = createCanvas(400, 300);
-	//Place cavas inside desired DOM element
-	canvas.parent('jumbo-canvas');
-  
-  
-
-	//graphics element on top of video feed
-	pixelDensity(1);
-	pg = createGraphics(width, height);
-
-	//Randomly choose size and color
-	myColor = [random(255), random(255), random(255)]
-	mySize = random(10,70)
-  
-  
-  input = createFileInput(handleFile);
-  // input.position(0, 0);
-  
-  background(222, 222, 222);
-
-
-
+function setupDemo() {
+  model.initialize().then(() => {
+    stylize();
+  });
 }
 
-function draw() {
-  if (img) { //if change background is clicked 
-    image(img, 0, 0, width, height);
+async function clearCanvas() {
+  // Don't block painting until we've reset the state.
+  await mi.tf.nextFrame();
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  await mi.tf.nextFrame();
+}
+  
+async function stylize() {
+  await clearCanvas();
+  
+  // Resize the canvas to be the same size as the source image.
+  canvas.width = contentImg.width;
+  canvas.height = contentImg.height;
+  
+  // This does all the work!
+  model.stylize(contentImg, styleImg).then((imageData) => {
+    stopLoading();
+    ctx.putImageData(imageData, 0, 0);
+  });
+}
 
+function loadImage(event, imgElement) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    imgElement.src = e.target.result;
+    startLoading();
+    stylize();
+  };
+  reader.readAsDataURL(event.target.files[0]);
+}
+
+function loadContent(event) {
+  loadImage(event, contentImg);
+}
+
+function loadStyle(event) {
+  loadImage(event, styleImg);
+}
+
+function startLoading() {
+  loading.hidden = false;
+  notLoading.hidden = true;  
+  canvas.style.opacity = 0;
+}
+
+function stopLoading() {
+  loading.hidden = true;
+  notLoading.hidden = false; 
+  canvas.style.opacity = 1;
 }
 
 
-	//draw graphics element aka the drawing
-	image(pg, 0, 0, width, height);
-
-  
 
 
+//Drawing
+
+var mousePressed = false;
+var lastX, lastY;
+
+
+$('#stylized').mousedown(function (e) {
+  mousePressed = true;
+  Draw(e.pageX - $(this).offset().left, e.pageY - $(this).offset().top, false);
+});
+
+$('#stylized').mousemove(function (e) {
+  if (mousePressed) {
+      Draw(e.pageX - $(this).offset().left, e.pageY - $(this).offset().top, true);
   }
+});
 
-//function that deals with moouse drawing
-function mouseDragged(){
-
-	if (img){
-		//draw on the pg element the ellipse
-		pg.noStroke();
-		pg.fill(myColor[0], myColor[1], myColor[2]);
-		pg.ellipse(mouseX, mouseY, mySize, mySize);
-
-  }
+$('#stylized').mouseup(function (e) {
+  mousePressed = false;
+});
+$('#stylized').mouseleave(function (e) {
+  mousePressed = false;
+});
 
 
+function Draw(x, y, isDown) {
+    if (isDown) {
+        ctx.beginPath();
+        ctx.strokeStyle = $('#selColor').val();
+        ctx.lineWidth = $('#selWidth').val();
+        ctx.lineJoin = "round";
+        ctx.moveTo(lastX, lastY);
+        ctx.lineTo(x, y);
+        ctx.closePath();
+        ctx.stroke();
+    }
+    lastX = x; lastY = y;
 }
 
-function handleFile(file) {
-  print(file);
-  if (file.type === 'image') {
-    img = createImg(file.data, '');
-    img.hide();
-  } else {
-    img = null;
-  }
-}
-  
+download_img = function(el) {
+  var image = canvas.toDataURL("image/jpg");
+  el.href = image;
+};
 
-  
+//New Canvas setup resources: 
 
-
-//function to download the canvas once a user is done.
-function downloadcanvas(){
-	console.log("ok lets download");
-	save(canvas, "art", 'png');
-
-}
+//https://jsfiddle.net/user2314737/28wqq1gu/
+//https://www.codicode.com/art/how_to_draw_on_a_html5_canvas_with_a_mouse.aspx
+	
