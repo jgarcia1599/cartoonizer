@@ -6,9 +6,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="style.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@magenta/image@0.2.1/dist/magentaimage.min.js"></script>
     <script src="script.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/p5@1.1.9/lib/p5.js"></script>
     
   </head>  
   <body>
@@ -36,6 +36,15 @@
       
       <div class="frame">
         <h2 class="dark">Step 3. <span id="loading">Transmogrifying ...</span><span id="ready" hidden>Profit!</span></h2>
+        <a id="download" download="myImage.jpg" href="" onclick="download_img(this);">Download to myImage.jpg</a>
+       <span style="color: black;">Color :</span> <select id="selColor">
+          <option value="black">black</option>
+          <option value="blue" selected="selected">blue</option>
+          <option value="red">red</option>
+          <option value="green">green</option>
+          <option value="yellow">yellow</option>
+          <option value="gray">gray</option>
+      </select>
         <canvas id="stylized" height="250px"></canvas>
       </div>
     </div>

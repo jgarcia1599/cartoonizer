@@ -5,22 +5,13 @@ const contentImg = document.getElementById('content');
 const styleImg = document.getElementById('style');
 const loading = document.getElementById('loading');
 const notLoading = document.getElementById('ready');
-let pg, img;
-let myColor, mySize, input;
 
-// setupDemo();
+setupDemo();
 
-function setup() {
-	pixelDensity(1);
-	pg = createGraphics(contentImg.width, contentImg.height);
-	// input = createFileInput(handleFile);
-	//Randomly choose size and color
-	myColor = [Math.random(255), Math.random(255), Math.random(255)];
-	mySize = Math.random(10,70);
-
-	model.initialize().then(() => {
-	stylize();
-	});
+function setupDemo() {
+  model.initialize().then(() => {
+    stylize();
+  });
 }
 
 async function clearCanvas() {
@@ -40,9 +31,7 @@ async function stylize() {
   // This does all the work!
   model.stylize(contentImg, styleImg).then((imageData) => {
     stopLoading();
-    console.log(imageData);
     ctx.putImageData(imageData, 0, 0);
-    let imgData = ctx.getImageData(0, 0, contentImg.width, contentImg.height);
   });
 }
 
@@ -71,40 +60,56 @@ function startLoading() {
 }
 
 function stopLoading() {
-	loading.hidden = true;
-	notLoading.hidden = false; 
-	canvas.style.opacity = 1;
-}
-
-function draw() {
-  if (img) { //if change background is clicked 
-    image(img, 0, 0, contentImg.width, contentImg.height);
-
+  loading.hidden = true;
+  notLoading.hidden = false; 
+  canvas.style.opacity = 1;
 }
 
 
-	//draw graphics element aka the drawing
-	image(pg, 0, 0, contentImg.width, contentImg.height);
-
-  
+var mousePressed = false;
+var lastX, lastY;
 
 
+$('#stylized').mousedown(function (e) {
+  mousePressed = true;
+  Draw(e.pageX - $(this).offset().left, e.pageY - $(this).offset().top, false);
+});
+
+$('#stylized').mousemove(function (e) {
+  if (mousePressed) {
+      Draw(e.pageX - $(this).offset().left, e.pageY - $(this).offset().top, true);
   }
+});
 
-//function that deals with moouse drawing
-function mouseDragged(){
-
-	if (img){
-		//draw on the pg element the ellipse
-		pg.noStroke();
-		pg.fill(myColor[0], myColor[1], myColor[2]);
-		pg.ellipse(mouseX, mouseY, mySize, mySize);
-
-  }
+$('#stylized').mouseup(function (e) {
+  mousePressed = false;
+});
+$('#stylized').mouseleave(function (e) {
+  mousePressed = false;
+});
 
 
+function Draw(x, y, isDown) {
+    if (isDown) {
+        ctx.beginPath();
+        ctx.strokeStyle = $('#selColor').val();
+        ctx.lineWidth = $('#selWidth').val();
+        ctx.lineJoin = "round";
+        ctx.moveTo(lastX, lastY);
+        ctx.lineTo(x, y);
+        ctx.closePath();
+        ctx.stroke();
+    }
+    lastX = x; lastY = y;
 }
 
-function handleFile() {
+download_img = function(el) {
+  var image = canvas.toDataURL("image/jpg");
+  el.href = image;
+};
+
+//New Canvas setup resources: 
+
+//https://jsfiddle.net/user2314737/28wqq1gu/
+//https://www.codicode.com/art/how_to_draw_on_a_html5_canvas_with_a_mouse.aspx
 	
-}
