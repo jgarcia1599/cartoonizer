@@ -43,8 +43,6 @@ async function stylize() {
     console.log(imageData);
     ctx.putImageData(imageData, 0, 0);
     let imgData = ctx.getImageData(0, 0, contentImg.width, contentImg.height);
-    
-	img = createImg('myImage.png', '');
   });
 }
 
