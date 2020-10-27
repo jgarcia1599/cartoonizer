@@ -8,13 +8,14 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@magenta/image@0.2.1/dist/magentaimage.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Gloria+Hallelujah&display=swap" rel="stylesheet">
     <script src="script.js" defer></script>
     
   </head>  
   <body>
     <div class="container">
       <div class="left">
-        <h1>
+        <h1 id="title">
           <b>Arbitrary</b> Style Transfer with <a href="https://www.npmjs.com/package/@magenta/image">magenta.js</a>
         </h1>
       </div>
@@ -36,7 +37,7 @@
       
       <div class="frame">
         <h2 class="dark">Step 3. <span id="loading">Transmogrifying ...</span><span id="ready" hidden>Profit!</span></h2>
-        <a id="download" download="myImage.jpg" href="" onclick="download_img(this);">Download to myImage.jpg</a>
+        <span style="color: black;"><a id="download" download="myImage.jpg" href="" onclick="download_img(this);">Download to myImage.jpg</a></span>
        <span style="color: black;">Color :</span> <select id="selColor">
           <option value="black">black</option>
           <option value="blue" selected="selected">blue</option>
