@@ -1,56 +1,92 @@
-/* If you're feeling fancy you can add interactivity 
-    to your site with Javascript */
+const model = new mi.ArbitraryStyleTransferNetwork();
+const canvas = document.getElementById('stylized');
+const ctx = canvas.getContext('2d');
+const contentImg = document.getElementById('content');
+const styleImg = document.getElementById('style');
+const loading = document.getElementById('loading');
+const notLoading = document.getElementById('ready');
+let pg, img;
+let myColor, mySize, input;
 
+// setupDemo();
 
-console.log("hi");
-
-
-
-
-
-
-var  myColor, mySize,canvas;
-
-
-let pg;
-
-let input,img;
-
-function setup(){
-	//Create canvas
-	canvas = createCanvas(400, 300);
-	//Place cavas inside desired DOM element
-	canvas.parent('jumbo-canvas');
-  
-  
-
-	//graphics element on top of video feed
+function setup() {
 	pixelDensity(1);
-	pg = createGraphics(width, height);
-
+	pg = createGraphics(contentImg.width, contentImg.height);
+	// input = createFileInput(handleFile);
 	//Randomly choose size and color
-	myColor = [random(255), random(255), random(255)]
-	mySize = random(10,70)
-  
-  
-  input = createFileInput(handleFile);
-  // input.position(0, 0);
-  
-  background(222, 222, 222);
+	myColor = [Math.random(255), Math.random(255), Math.random(255)];
+	mySize = Math.random(10,70);
 
+	model.initialize().then(() => {
+	stylize();
+	});
+}
 
+async function clearCanvas() {
+  // Don't block painting until we've reset the state.
+  await mi.tf.nextFrame();
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  await mi.tf.nextFrame();
+}
+  
+async function stylize() {
+  await clearCanvas();
+  
+  // Resize the canvas to be the same size as the source image.
+  canvas.width = contentImg.width;
+  canvas.height = contentImg.height;
+  
+  // This does all the work!
+  model.stylize(contentImg, styleImg).then((imageData) => {
+    stopLoading();
+    console.log(imageData);
+    ctx.putImageData(imageData, 0, 0);
+    let imgData = ctx.getImageData(0, 0, contentImg.width, contentImg.height);
+    
+	img = createImg('myImage.png', '');
+  });
+}
 
+function loadImage(event, imgElement) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    imgElement.src = e.target.result;
+    startLoading();
+    stylize();
+  };
+  reader.readAsDataURL(event.target.files[0]);
+}
+
+function loadContent(event) {
+  loadImage(event, contentImg);
+}
+
+function loadStyle(event) {
+  loadImage(event, styleImg);
+}
+
+function startLoading() {
+  loading.hidden = false;
+  notLoading.hidden = true;  
+  canvas.style.opacity = 0;
+}
+
+function stopLoading() {
+	loading.hidden = true;
+	notLoading.hidden = false; 
+	canvas.style.opacity = 1;
 }
 
 function draw() {
   if (img) { //if change background is clicked 
-    image(img, 0, 0, width, height);
+    image(img, 0, 0, contentImg.width, contentImg.height);
 
 }
 
 
 	//draw graphics element aka the drawing
-	image(pg, 0, 0, width, height);
+	image(pg, 0, 0, contentImg.width, contentImg.height);
 
   
 
@@ -71,23 +107,6 @@ function mouseDragged(){
 
 }
 
-function handleFile(file) {
-  print(file);
-  if (file.type === 'image') {
-    img = createImg(file.data, '');
-    img.hide();
-  } else {
-    img = null;
-  }
-}
-  
-
-  
-
-
-//function to download the canvas once a user is done.
-function downloadcanvas(){
-	console.log("ok lets download");
-	save(canvas, "art", 'png');
-
+function handleFile() {
+	
 }
