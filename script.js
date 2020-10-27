@@ -66,6 +66,10 @@ function stopLoading() {
 }
 
 
+
+
+//Drawing
+
 var mousePressed = false;
 var lastX, lastY;
 
